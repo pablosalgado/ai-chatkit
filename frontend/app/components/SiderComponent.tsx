@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Layout, Menu, Collapse, Button } from 'antd';
 import { PlusOutlined, TeamOutlined } from '@ant-design/icons';
 import NewChatButton from './NewChatButton';
@@ -28,12 +28,31 @@ const SiderComponent: React.FC<SiderComponentProps> = ({
 }) => {
   const { currentThreadId, setCurrentThreadId } = useLayoutContext()
 
-  // Mock group data for placeholder
-  const mockGroups = [
-    { key: 'group-1', label: 'Marketing Team' },
-    { key: 'group-2', label: 'Engineering Team' },
-    { key: 'group-3', label: 'Product Team' },
-  ];
+  // State for managing groups
+  const [groups, setGroups] = useState<Array<{ key: string; label: string }>>([]);
+
+  // Function to generate unique group name
+  const generateUniqueGroupName = () => {
+    const existingNumbers = groups
+      .map(group => {
+        const match = group.label.match(/^Group (\d+)$/);
+        return match ? parseInt(match[1], 10) : 0;
+      })
+      .filter(num => num > 0);
+
+    const maxNumber = existingNumbers.length > 0 ? Math.max(...existingNumbers) : 0;
+    return `Group ${maxNumber + 1}`;
+  };
+
+  // Handler for creating new group
+  const handleNewGroup = () => {
+    const newGroupName = generateUniqueGroupName();
+    const newGroup = {
+      key: `group-${Date.now()}`,
+      label: newGroupName,
+    };
+    setGroups(prev => [...prev, newGroup]);
+  };
 
   return (
     <Sider
@@ -69,6 +88,7 @@ const SiderComponent: React.FC<SiderComponentProps> = ({
                       icon={<PlusOutlined />}
                       className="w-full mb-3"
                       style={{ backgroundColor: '#1890ff', marginLeft: 0, marginRight: 0 }}
+                      onClick={handleNewGroup}
                     >
                       New Group
                     </Button>
@@ -78,7 +98,7 @@ const SiderComponent: React.FC<SiderComponentProps> = ({
                       selectable={false}
                       className="border-0"
                       style={{ backgroundColor: 'transparent' }}
-                      items={mockGroups.map(group => ({
+                      items={groups.map(group => ({
                         key: group.key,
                         icon: <TeamOutlined />,
                         label: group.label,
