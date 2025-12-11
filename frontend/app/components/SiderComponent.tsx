@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Layout, Menu, Collapse, Button } from 'antd';
-import { PlusOutlined, TeamOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import NewChatButton from './NewChatButton';
+import GroupListItem from './GroupListItem';
 import { useLayoutContext } from '../layout-context'
 
 
@@ -54,6 +55,11 @@ const SiderComponent: React.FC<SiderComponentProps> = ({
     setGroups(prev => [...prev, newGroup]);
   };
 
+  // Handler for deleting a group
+  const handleDeleteGroup = (key: string) => {
+    setGroups(prev => prev.filter(group => group.key !== key));
+  };
+
   return (
     <Sider
       collapsible
@@ -100,8 +106,7 @@ const SiderComponent: React.FC<SiderComponentProps> = ({
                       style={{ backgroundColor: 'transparent' }}
                       items={groups.map(group => ({
                         key: group.key,
-                        icon: <TeamOutlined />,
-                        label: group.label,
+                        label: <GroupListItem group={group} onDelete={handleDeleteGroup} />,
                       }))}
                     />
                   </div>
